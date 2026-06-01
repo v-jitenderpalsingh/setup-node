@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import path from 'path';
+import * as exec from '@actions/exec';
 
 import BaseDistribution from '../base-distribution';
 import {NodeInputs, INodeVersion, INodeVersionInfo} from '../base-models';
@@ -62,7 +63,10 @@ export default class OfficialBuilds extends BaseDistribution {
 
     if (toolPath) {
       core.info(`Found in cache @ ${toolPath}`);
+      const resolvedVersion = path.basename(path.dirname(toolPath));
       this.addToolPath(toolPath);
+      // Added for testing issue 1556
+      await this.verifyNodeVersion(resolvedVersion);
       return;
     }
 
@@ -111,7 +115,8 @@ export default class OfficialBuilds extends BaseDistribution {
           `Received HTTP status code ${err.httpStatusCode}. This usually indicates the rate limit has been exceeded`
         );
       } else {
-        core.info((err as Error).message);
+        //Changed for testing issue 1556 - log the error message and stack trace for better debugging
+        core.warning((err as Error).message);
       }
       core.debug((err as Error).stack ?? 'empty stack');
       core.info('Falling back to download directly from Node');
@@ -120,12 +125,16 @@ export default class OfficialBuilds extends BaseDistribution {
     if (!toolPath) {
       toolPath = await this.downloadDirectlyFromNode();
     }
+    
+    const resolvedVersion = path.basename(path.dirname(toolPath));
 
     if (this.osPlat != 'win32') {
       toolPath = path.join(toolPath, 'bin');
     }
 
     core.addPath(toolPath);
+    // Added for testing issue 1556
+    await this.verifyNodeVersion(resolvedVersion);
   }
 
   protected addToolPath(toolPath: string) {
@@ -293,5 +302,17 @@ export default class OfficialBuilds extends BaseDistribution {
 
   private isLatestSyntax(versionSpec): boolean {
     return ['current', 'latest', 'node'].includes(versionSpec);
+  }
+
+  //Added for testing issue 1556
+  private async verifyNodeVersion(expectedVersion: string) {
+    expectedVersion = "v" + expectedVersion;
+    const {stdout} = await exec.getExecOutput('node', ['--version']);
+    const actualVersion: string = stdout.trim();
+    if (actualVersion !== expectedVersion) {
+      throw new Error(
+        `Installed Node version ${actualVersion} does not match expected version ${expectedVersion}.`
+      );
+    }
   }
 }
