@@ -309,6 +309,8 @@ export default class OfficialBuilds extends BaseDistribution {
     expectedVersion = "v" + expectedVersion;
     const {stdout} = await exec.getExecOutput('node', ['--version']);
     const actualVersion: string = stdout.trim();
+    core.info(`Expected Node version: ${expectedVersion}`);
+    core.info(`Actual Node version: ${actualVersion}`);
     if (actualVersion !== expectedVersion) {
       throw new Error(
         `Installed Node version ${actualVersion} does not match expected version ${expectedVersion}.`
