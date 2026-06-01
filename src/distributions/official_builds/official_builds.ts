@@ -125,7 +125,7 @@ export default class OfficialBuilds extends BaseDistribution {
     if (!toolPath) {
       toolPath = await this.downloadDirectlyFromNode();
     }
-    
+
     const resolvedVersion = path.basename(path.dirname(toolPath));
 
     if (this.osPlat != 'win32') {
@@ -306,7 +306,7 @@ export default class OfficialBuilds extends BaseDistribution {
 
   //Added for testing issue 1556
   private async verifyNodeVersion(expectedVersion: string) {
-    expectedVersion = "v" + expectedVersion;
+    expectedVersion = 'v' + expectedVersion;
     const {stdout} = await exec.getExecOutput('node', ['--version']);
     const actualVersion: string = stdout.trim();
     core.info(`Expected Node version: ${expectedVersion}`);
