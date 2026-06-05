@@ -63,10 +63,11 @@ export default class OfficialBuilds extends BaseDistribution {
 
     if (toolPath) {
       core.info(`Found in cache @ ${toolPath}`);
-      const resolvedVersion = path.basename(path.dirname(toolPath));
+
+      const installedDir = toolPath;
       this.addToolPath(toolPath);
       // Added for testing issue 1556
-      await this.verifyNodeVersion(resolvedVersion);
+      await this.verifyNodeVersion(installedDir);
       return;
     }
 
@@ -126,15 +127,14 @@ export default class OfficialBuilds extends BaseDistribution {
       toolPath = await this.downloadDirectlyFromNode();
     }
 
-    const resolvedVersion = path.basename(path.dirname(toolPath));
-
+    const installedDir = toolPath;
     if (this.osPlat != 'win32') {
       toolPath = path.join(toolPath, 'bin');
     }
 
     core.addPath(toolPath);
     // Added for testing issue 1556
-    await this.verifyNodeVersion(resolvedVersion);
+    await this.verifyNodeVersion(installedDir);
   }
 
   protected addToolPath(toolPath: string) {
@@ -305,7 +305,9 @@ export default class OfficialBuilds extends BaseDistribution {
   }
 
   //Added for testing issue 1556
-  private async verifyNodeVersion(expectedVersion: string) {
+  private async verifyNodeVersion(toolPath: any) {
+    // tool-cache layout: <root>/node/<version>/<arch>
+    let expectedVersion = path.basename(path.dirname(toolPath));
     expectedVersion = 'v' + expectedVersion;
     const {stdout} = await exec.getExecOutput('node', ['--version']);
     const actualVersion: string = stdout.trim();
