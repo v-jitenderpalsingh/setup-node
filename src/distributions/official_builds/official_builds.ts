@@ -306,11 +306,19 @@ export default class OfficialBuilds extends BaseDistribution {
 
   //Added for testing issue 1556
   private async verifyNodeVersion(toolPath: any) {
+
     // tool-cache layout: <root>/node/<version>/<arch>
     let expectedVersion = path.basename(path.dirname(toolPath));
     expectedVersion = 'v' + expectedVersion;
-    const {stdout} = await exec.getExecOutput('node', ['--version']);
-    const actualVersion: string = stdout.trim();
+    
+    let actualVersion: string = '';
+    try {
+      const {stdout} = await exec.getExecOutput('node', ['--version']);
+      actualVersion = stdout.trim();
+    } catch (err) {
+      throw new Error(`Failed to execute 'node --version'. Node may not be installed or not on PATH: ${(err as Error).message}`);
+    }
+
     core.info(`Expected Node version: ${expectedVersion}`);
     core.info(`Actual Node version: ${actualVersion}`);
     if (actualVersion !== expectedVersion) {
