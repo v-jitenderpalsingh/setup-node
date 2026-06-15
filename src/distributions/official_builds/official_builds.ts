@@ -17,6 +17,7 @@ export default class OfficialBuilds extends BaseDistribution {
   }
 
   public async setupNodeJs() {
+    // Retry logic
     const maxAttempts = 3;
     let lastError: Error | undefined;
 
@@ -41,7 +42,7 @@ export default class OfficialBuilds extends BaseDistribution {
 
     throw new Error(`Failed to set up Node. Error: ${lastError?.message}`);
   }
-
+  //Function to clear cached node version.
   private async clearCachedNodeVersion() {
     try {
       const cached = this.findVersionInHostedToolCacheDirectory();
@@ -57,7 +58,7 @@ export default class OfficialBuilds extends BaseDistribution {
       );
     }
   }
-
+  //Changed function name..
   private async installNode() {
     let manifest: tc.IToolRelease[] | undefined;
     let nodeJsVersions: INodeVersion[] | undefined;
@@ -107,8 +108,11 @@ export default class OfficialBuilds extends BaseDistribution {
     if (toolPath) {
       core.info(`Found in cache @ ${toolPath}`);
 
+      //Added this for testing issue 1556
       const installedDir = toolPath;
+
       this.addToolPath(toolPath);
+
       // Added for testing issue 1556
       await this.verifyNodeVersion(installedDir);
       return;
@@ -170,12 +174,14 @@ export default class OfficialBuilds extends BaseDistribution {
       toolPath = await this.downloadDirectlyFromNode();
     }
 
+    // Added changes here for issue 1556
     const installedDir = toolPath;
+
     if (this.osPlat != 'win32') {
       toolPath = path.join(toolPath, 'bin');
     }
-
     core.addPath(toolPath);
+
     // Added for testing issue 1556
     await this.verifyNodeVersion(installedDir);
   }
@@ -366,9 +372,7 @@ export default class OfficialBuilds extends BaseDistribution {
     core.info(`Expected Node version: ${expectedVersion}`);
     core.info(`Actual Node version: ${actualVersion}`);
     if (actualVersion !== expectedVersion) {
-      throw new Error(
-        `Due to network issue, Node installation failed, Please try again.`
-      );
+      throw new Error(`Due to network issue, Node installation failed.`);
     }
   }
 }
