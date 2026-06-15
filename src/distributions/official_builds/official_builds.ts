@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import path from 'path';
 import * as exec from '@actions/exec';
+import * as io from '@actions/io';
 
 import BaseDistribution from '../base-distribution';
 import {NodeInputs, INodeVersion, INodeVersionInfo} from '../base-models';
@@ -16,6 +17,48 @@ export default class OfficialBuilds extends BaseDistribution {
   }
 
   public async setupNodeJs() {
+    const maxAttempts = 3;
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await this.installNode();
+        return;
+      } catch (err) {
+        lastError = err as Error;
+        core.debug(lastError.stack ?? 'empty stack');
+
+        if (attempt < maxAttempts) {
+          // A previous attempt may have left a partially-extracted / corrupted
+          // version in the cache, so clear it before retrying.
+          await this.clearCachedNodeVersion();
+          core.warning(
+            `Node setup attempt failed: ${lastError.message}. Retrying to install....`
+          );
+        }
+      }
+    }
+
+    throw new Error(`Failed to set up Node. Error: ${lastError?.message}`);
+  }
+
+  private async clearCachedNodeVersion() {
+    try {
+      const cached = this.findVersionInHostedToolCacheDirectory();
+      if (cached) {
+        core.info(
+          `Removing potentially corrupted cached Node directory: ${cached}`
+        );
+        await io.rmRF(cached);
+      }
+    } catch (err) {
+      core.debug(
+        `Failed to clear cached Node directory: ${(err as Error).message}`
+      );
+    }
+  }
+
+  private async installNode() {
     let manifest: tc.IToolRelease[] | undefined;
     let nodeJsVersions: INodeVersion[] | undefined;
     const osArch = this.translateArchToDistUrl(this.nodeInfo.arch);
@@ -324,7 +367,7 @@ export default class OfficialBuilds extends BaseDistribution {
     core.info(`Actual Node version: ${actualVersion}`);
     if (actualVersion !== expectedVersion) {
       throw new Error(
-        `Installed Node version ${actualVersion} does not match expected version ${expectedVersion}.`
+        `Due to network issue, Node installation failed, Please try again.`
       );
     }
   }
