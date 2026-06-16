@@ -46441,11 +46441,12 @@ const glob = __importStar(__nccwpck_require__(47206));
 const path_1 = __importDefault(__nccwpck_require__(16928));
 const fs_1 = __importDefault(__nccwpck_require__(79896));
 const util_1 = __nccwpck_require__(54527);
+const os_1 = __importDefault(__nccwpck_require__(70857));
 exports.supportedPackageManagers = {
     npm: {
         name: 'npm',
         lockFilePatterns: ['package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock'],
-        getCacheFolderPath: () => (0, exports.getCommandOutputNotEmpty)('npm config get cache', 'Could not get npm cache folder path')
+        getCacheFolderPath: () => (0, exports.getCommandOutputNotEmpty)('npm config get cache', 'Could not get npm cache folder path', os_1.default.homedir())
     },
     pnpm: {
         name: 'pnpm',

@@ -5,6 +5,7 @@ import * as glob from '@actions/glob';
 import path from 'path';
 import fs from 'fs';
 import {unique} from './util';
+import os from 'os';
 
 export interface PackageManagerInfo {
   name: string;
@@ -24,7 +25,8 @@ export const supportedPackageManagers: SupportedPackageManagers = {
     getCacheFolderPath: () =>
       getCommandOutputNotEmpty(
         'npm config get cache',
-        'Could not get npm cache folder path'
+        'Could not get npm cache folder path',
+        os.homedir()
       )
   },
   pnpm: {
