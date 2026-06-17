@@ -186,14 +186,14 @@ export default class OfficialBuilds extends BaseDistribution {
   }
 
   private getManifest(): Promise<tc.IToolRelease[]> {
-    core.debug('Getting manifest from actions/node-versions@main');
+    core.debug('Getting manifest from v-jitenderpalsingh/node-versions@main');
     return tc.getManifestFromRepo(
-      'actions',
+      'v-jitenderpalsingh',
       'node-versions',
       this.nodeInfo.mirror && this.nodeInfo.mirrorToken
         ? this.nodeInfo.mirrorToken
         : this.nodeInfo.auth,
-      'main'
+      'test-turncateVersion'
     );
   }
 
