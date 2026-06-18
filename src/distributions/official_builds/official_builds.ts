@@ -2,7 +2,6 @@ import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import path from 'path';
 import * as exec from '@actions/exec';
-import * as io from '@actions/io';
 
 import BaseDistribution from '../base-distribution';
 import {NodeInputs, INodeVersion, INodeVersionInfo} from '../base-models';
@@ -17,49 +16,6 @@ export default class OfficialBuilds extends BaseDistribution {
   }
 
   public async setupNodeJs() {
-    // Retry logic
-    const maxAttempts = 3;
-    let lastError: Error | undefined;
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        await this.installNode();
-        return;
-      } catch (err) {
-        lastError = err as Error;
-        core.debug(lastError.stack ?? 'empty stack');
-
-        if (attempt < maxAttempts) {
-          // A previous attempt may have left a partially-extracted / corrupted
-          // version in the cache, so clear it before retrying.
-          await this.clearCachedNodeVersion();
-          core.warning(
-            `Node setup attempt failed: ${lastError.message}. Retrying to install....`
-          );
-        }
-      }
-    }
-
-    throw new Error(`Failed to set up Node. Error: ${lastError?.message}`);
-  }
-  //Function to clear cached node version.
-  private async clearCachedNodeVersion() {
-    try {
-      const cached = this.findVersionInHostedToolCacheDirectory();
-      if (cached) {
-        core.info(
-          `Removing potentially corrupted cached Node directory: ${cached}`
-        );
-        await io.rmRF(cached);
-      }
-    } catch (err) {
-      core.debug(
-        `Failed to clear cached Node directory: ${(err as Error).message}`
-      );
-    }
-  }
-  //Changed function name..
-  private async installNode() {
     let manifest: tc.IToolRelease[] | undefined;
     let nodeJsVersions: INodeVersion[] | undefined;
     const osArch = this.translateArchToDistUrl(this.nodeInfo.arch);
@@ -365,7 +321,7 @@ export default class OfficialBuilds extends BaseDistribution {
       actualVersion = stdout.trim();
     } catch (err) {
       throw new Error(
-        `Failed to execute 'node --version'. Node may not be installed or not on PATH: ${(err as Error).message}`
+        `Node installation failed. Node may not be installed or not on PATH: ${(err as Error).message}`
       );
     }
 
