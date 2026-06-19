@@ -126,7 +126,7 @@ export default class OfficialBuilds extends BaseDistribution {
     }
 
     // tool-cache layout: <root>/node/<version>/<arch>
-    const expectedVersion = path.basename(path.dirname(toolPath));
+    const expectedVersion = 'v' + path.basename(path.dirname(toolPath));
 
     if (this.osPlat != 'win32') {
       toolPath = path.join(toolPath, 'bin');
