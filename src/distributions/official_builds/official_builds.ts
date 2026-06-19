@@ -92,7 +92,9 @@ export default class OfficialBuilds extends BaseDistribution {
         downloadPath = await tc.downloadTool(
           versionInfo.downloadUrl,
           undefined,
-          this.nodeInfo.mirror ? this.nodeInfo.mirrorToken : this.nodeInfo.auth
+          this.nodeInfo.mirror && this.nodeInfo.mirrorToken
+            ? this.nodeInfo.mirrorToken
+            : this.nodeInfo.auth
         );
 
         if (downloadPath) {
@@ -202,7 +204,9 @@ export default class OfficialBuilds extends BaseDistribution {
     return tc.getManifestFromRepo(
       'actions',
       'node-versions',
-      this.nodeInfo.mirror ? this.nodeInfo.mirrorToken : this.nodeInfo.auth,
+      this.nodeInfo.mirror && this.nodeInfo.mirrorToken
+        ? this.nodeInfo.mirrorToken
+        : this.nodeInfo.auth,
       'main'
     );
   }
