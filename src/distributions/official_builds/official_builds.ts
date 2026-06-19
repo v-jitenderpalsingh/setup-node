@@ -63,14 +63,7 @@ export default class OfficialBuilds extends BaseDistribution {
 
     if (toolPath) {
       core.info(`Found in cache @ ${toolPath}`);
-
-      //Added this for testing issue 1556
-      const installedDir = toolPath;
-
       this.addToolPath(toolPath);
-
-      // Added for testing issue 1556
-      await this.verifyNodeVersion(installedDir);
       return;
     }
 
@@ -132,8 +125,8 @@ export default class OfficialBuilds extends BaseDistribution {
       toolPath = await this.downloadDirectlyFromNode();
     }
 
-    // Added changes here for issue 1556
-    const installedDir = toolPath;
+    // tool-cache layout: <root>/node/<version>/<arch>
+    const expectedVersion = path.basename(path.dirname(toolPath));
 
     if (this.osPlat != 'win32') {
       toolPath = path.join(toolPath, 'bin');
@@ -141,7 +134,7 @@ export default class OfficialBuilds extends BaseDistribution {
     core.addPath(toolPath);
 
     // Added for testing issue 1556
-    await this.verifyNodeVersion(installedDir);
+    await this.verifyNodeVersion(expectedVersion);
   }
 
   protected addToolPath(toolPath: string) {
@@ -314,11 +307,7 @@ export default class OfficialBuilds extends BaseDistribution {
   }
 
   //Added for testing issue 1556
-  private async verifyNodeVersion(toolPath: any) {
-    // tool-cache layout: <root>/node/<version>/<arch>
-    let expectedVersion = path.basename(path.dirname(toolPath));
-    expectedVersion = 'v' + expectedVersion;
-
+  private async verifyNodeVersion(expectedVersion: string) {
     let actualVersion: string = '';
     try {
       const {stdout} = await exec.getExecOutput('node', ['--version']);
@@ -328,11 +317,12 @@ export default class OfficialBuilds extends BaseDistribution {
         `Node installation failed. Node may not be installed or not on PATH: ${(err as Error).message}`
       );
     }
-
     core.info(`Expected Node version: ${expectedVersion}`);
     core.info(`Actual Node version: ${actualVersion}`);
     if (actualVersion !== expectedVersion) {
-      throw new Error(`Due to network issue, Node installation failed.`);
+      throw new Error(
+        `Node ${expectedVersion} installation failed, likely due to a network issue. Please try again.`
+      );
     }
   }
 }
