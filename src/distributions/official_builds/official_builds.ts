@@ -116,8 +116,7 @@ export default class OfficialBuilds extends BaseDistribution {
           `Received HTTP status code ${err.httpStatusCode}. This usually indicates the rate limit has been exceeded`
         );
       } else {
-        //Changed for testing issue 1556 - log the error message and stack trace for better debugging
-        core.warning((err as Error).message);
+        core.info((err as Error).message);
       }
       core.debug((err as Error).stack ?? 'empty stack');
       core.info('Falling back to download directly from Node');
@@ -193,7 +192,6 @@ export default class OfficialBuilds extends BaseDistribution {
   }
 
   // Validate manifest
-
   private isIToolRelease(obj: any): obj is tc.IToolRelease {
     return (
       typeof obj === 'object' &&
@@ -371,11 +369,9 @@ export default class OfficialBuilds extends BaseDistribution {
         `Node installation failed. Node may not be installed or not on PATH: ${(err as Error).message}`
       );
     }
-    core.info(`Expected Node version: ${expectedVersion}`);
-    core.info(`Actual Node version: ${actualVersion}`);
     if (actualVersion !== expectedVersion) {
       throw new Error(
-        `Node ${expectedVersion} installation failed, likely due to a network issue. Please try again.`
+        `Node ${expectedVersion} installation failed, likely due to an incomplete or corrupted download.`
       );
     }
   }
