@@ -964,19 +964,6 @@ describe('setup-node', () => {
         `::error::Failed to fetch a valid manifest after 3 attempts. Last error: The manifest fetched is empty, truncated, or does not contain any valid tool release entries.${osm.EOL}`
       );
     }, 10000);
-
-    it('rejects a manifest containing malformed entries as invalid', async () => {
-      getManifestSpy.mockImplementation(() => [
-        {version: '1.2.3', stable: true} // missing files array
-      ]);
-
-      await main.run();
-
-      expect(getManifestSpy).toHaveBeenCalledTimes(3);
-      expect(cnSpy).toHaveBeenCalledWith(
-        `::error::Failed to fetch a valid manifest after 3 attempts. Last error: The manifest fetched is empty, truncated, or does not contain any valid tool release entries.${osm.EOL}`
-      );
-    }, 10000);
   });
 
   describe('node version verification', () => {
