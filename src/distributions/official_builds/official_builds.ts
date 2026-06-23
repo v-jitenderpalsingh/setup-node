@@ -131,8 +131,6 @@ export default class OfficialBuilds extends BaseDistribution {
       toolPath = path.join(toolPath, 'bin');
     }
     core.addPath(toolPath);
-
-    // Added for testing issue 1556
     await this.verifyNodeVersion(installedDir);
   }
 
@@ -201,6 +199,8 @@ export default class OfficialBuilds extends BaseDistribution {
       Array.isArray(obj.files) &&
       obj.files.every(
         (file: any) =>
+          typeof file === 'object' &&
+          file !== null &&
           typeof file.filename === 'string' &&
           typeof file.platform === 'string' &&
           typeof file.arch === 'string' &&
@@ -356,13 +356,14 @@ export default class OfficialBuilds extends BaseDistribution {
     return ['current', 'latest', 'node'].includes(versionSpec);
   }
 
-  //Added for testing issue 1556
-  private async verifyNodeVersion(installedDir: any) {
+  private async verifyNodeVersion(installedDir: string) {
     // tool-cache layout: <root>/node/<version>/<arch>
     const expectedVersion = 'v' + path.basename(path.dirname(installedDir));
     let actualVersion: string = '';
     try {
-      const {stdout} = await exec.getExecOutput('node', ['--version']);
+      const {stdout} = await exec.getExecOutput('node', ['--version'], {
+        silent: true
+      });
       actualVersion = stdout.trim();
     } catch (err) {
       throw new Error(

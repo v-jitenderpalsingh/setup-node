@@ -929,6 +929,11 @@ describe('setup-node', () => {
       const toolPath = path.normalize('/cache/node/12.16.2/x64');
       exSpy.mockImplementation(async () => '/some/other/temp/path');
       cacheSpy.mockImplementation(async () => toolPath);
+      getExecOutputSpy.mockImplementation(async () => ({
+        stdout: `v${path.basename(path.dirname(toolPath))}\n`,
+        stderr: '',
+        exitCode: 0
+      }));
 
       await main.run();
 
