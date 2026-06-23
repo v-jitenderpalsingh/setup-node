@@ -197,6 +197,7 @@ export default class OfficialBuilds extends BaseDistribution {
       typeof obj.version === 'string' &&
       typeof obj.stable === 'boolean' &&
       Array.isArray(obj.files) &&
+      obj.files.length > 0 &&
       obj.files.every(
         (file: any) =>
           typeof file === 'object' &&
