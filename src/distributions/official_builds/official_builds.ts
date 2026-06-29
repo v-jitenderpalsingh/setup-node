@@ -360,7 +360,7 @@ export default class OfficialBuilds extends BaseDistribution {
   private async verifyNodeVersion(installedDir: string) {
     // tool-cache layout: <root>/node/<version>/<arch>
     const expectedVersion = 'v' + path.basename(path.dirname(installedDir));
-    let actualVersion: string = '';
+    let actualVersion = '';
     try {
       const {stdout} = await exec.getExecOutput('node', ['--version'], {
         silent: true
