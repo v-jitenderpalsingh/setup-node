@@ -361,9 +361,8 @@ export default class OfficialBuilds extends BaseDistribution {
 
   private async verifyNodeVersion(installedDir: string) {
     // tool-cache layout: <root>/node/<version>/<arch>
-    core.info(`Installed directory: ${installedDir}`);
     core.info(
-      `This directory is used to extract the Node.js version from the path to verify the installation.`
+      `Installed directory: ${installedDir}. This directory is used to extract the Node.js version from the path to verify the installation.`
     );
     const expectedVersion = 'v' + path.basename(path.dirname(installedDir));
     let actualVersion = '';
