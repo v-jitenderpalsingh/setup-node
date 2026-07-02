@@ -130,6 +130,7 @@ export default class OfficialBuilds extends BaseDistribution {
     if (this.osPlat != 'win32') {
       toolPath = path.join(toolPath, 'bin');
     }
+    core.info(`toolPath added to PATH: ${toolPath}`);
     core.addPath(toolPath);
     await this.verifyNodeVersion(installedDir);
   }
@@ -139,6 +140,7 @@ export default class OfficialBuilds extends BaseDistribution {
       toolPath = path.join(toolPath, 'bin');
     }
 
+    core.info(`toolPath added to PATH: ${toolPath}`);
     core.addPath(toolPath);
   }
 
@@ -359,6 +361,10 @@ export default class OfficialBuilds extends BaseDistribution {
 
   private async verifyNodeVersion(installedDir: string) {
     // tool-cache layout: <root>/node/<version>/<arch>
+    core.info(`Installed directory: ${installedDir}`);
+    core.info(
+      `This directory is used to extract the Node.js version from the path to verify the installation.`
+    );
     const expectedVersion = 'v' + path.basename(path.dirname(installedDir));
     let actualVersion = '';
     try {
@@ -371,6 +377,8 @@ export default class OfficialBuilds extends BaseDistribution {
         `Node installation failed. Node may not be installed or not on PATH: ${(err as Error).message}`
       );
     }
+    core.info(`Expected version: ${expectedVersion}`);
+    core.info(`Actual version: ${actualVersion}`);
     if (actualVersion !== expectedVersion) {
       throw new Error(
         `Node ${expectedVersion} installation failed, likely due to an incomplete or corrupted download.`
