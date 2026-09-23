@@ -99619,7 +99619,7 @@ const supportedPackageManagers = {
     npm: {
         name: 'npm',
         lockFilePatterns: ['package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock'],
-        getCacheFolderPath: () => getCommandOutputNotEmpty('npm config get cache', 'Could not get npm cache folder path')
+        getCacheFolderPath: () => getCommandOutputNotEmpty('npm config get cache --force', 'Could not get npm cache folder path')
     },
     pnpm: {
         name: 'pnpm',

@@ -96,7 +96,7 @@ describe('cache-restore', () => {
 
   function findCacheFolder(command: string) {
     switch (command) {
-      case 'npm config get cache':
+      case 'npm config get cache --force':
         return npmCachePath;
       case 'pnpm store path --silent':
         return pnpmCachePath;
