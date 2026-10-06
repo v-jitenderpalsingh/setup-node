@@ -23,7 +23,7 @@ export const supportedPackageManagers: SupportedPackageManagers = {
     lockFilePatterns: ['package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock'],
     getCacheFolderPath: () =>
       getCommandOutputNotEmpty(
-        'npm config get cache --force',
+        'npm config get cache --quiet',
         'Could not get npm cache folder path'
       )
   },
